@@ -1,12 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
-# Load data
+# Load and clean data
 df = pd.read_csv("Adidas Vs Nike.csv")
-# Normalize brand names
 df['Brand'] = df['Brand'].str.lower().str.strip()
 df['Brand'] = df['Brand'].replace({
     'adidas core / neo': 'adidas',
@@ -16,7 +16,6 @@ df['Brand'] = df['Brand'].replace({
     'nike performance': 'nike',
     'nike sb': 'nike'
 })
-
 
 st.set_page_config(page_title="Adidas vs Nike Dashboard", layout="wide")
 st.title("📈 Adidas vs Nike Product Dashboard")
@@ -48,7 +47,6 @@ tab1, tab2, tab3 = st.tabs(["Brand Insights", "Price & Discounts", "Customer Fee
 
 with tab1:
     st.subheader("🔍 Brand-Level Insights")
-
     brand_group = filtered_df.groupby("Brand").agg({
         "Sale Price": "mean",
         "Listing Price": "mean",
@@ -56,8 +54,11 @@ with tab1:
         "Rating": "mean"
     }).reset_index()
 
-    fig1 = px.bar(brand_group, x="Brand", y="Discount", title="Average Discount by Brand", color="Brand")
-    fig2 = px.bar(brand_group, x="Brand", y="Rating", title="Average Rating by Brand", color="Brand")
+    fig1 = px.bar(brand_group.sort_values("Discount", ascending=False), x="Brand", y="Discount",
+                  color="Brand", title="Average Discount by Brand", text_auto=True)
+
+    fig2 = px.bar(brand_group.sort_values("Rating", ascending=False), x="Brand", y="Rating",
+                  color="Brand", title="Average Rating by Brand", text_auto=True, range_y=[0, 5])
 
     st.plotly_chart(fig1, use_container_width=True)
     st.plotly_chart(fig2, use_container_width=True)
@@ -65,13 +66,20 @@ with tab1:
 with tab2:
     st.subheader("💸 Price & Discount Analysis")
 
-    fig3 = px.histogram(filtered_df, x="Discount", nbins=30, color="Brand", title="Distribution of Discounts")
+    fig3 = px.histogram(filtered_df, x="Discount", nbins=30, color="Brand",
+                        title="Distribution of Discounts", barmode="overlay", opacity=0.7)
+
     fig4 = px.scatter(filtered_df, x="Listing Price", y="Sale Price", color="Brand", size="Discount",
-                      title="Sale vs Listing Price", hover_data=["Product Name"])
+                      title="Sale vs Listing Price", hover_name="Product Name")
+
+    # Add a diagonal reference line y=x
+    fig4.add_trace(go.Scatter(x=[0, max(df['Listing Price'])], y=[0, max(df['Listing Price'])],
+                              mode='lines', line=dict(dash='dash', color='gray'), name='Equal Price'))
 
     top_discounts = filtered_df.sort_values("Discount", ascending=False).head(10)
-    fig5 = px.bar(top_discounts, x="Product Name", y="Discount", color="Brand",
-                  title="Top 10 Highest Discounted Products")
+    top_discounts["Short Name"] = top_discounts["Product Name"].str.slice(0, 30)
+    fig5 = px.bar(top_discounts, x="Discount", y="Short Name", orientation='h', color="Brand",
+                  title="Top 10 Products with Highest Discounts", text_auto=True)
 
     st.plotly_chart(fig3, use_container_width=True)
     st.plotly_chart(fig4, use_container_width=True)
@@ -80,9 +88,11 @@ with tab2:
 with tab3:
     st.subheader("⭐ Customer Feedback")
 
-    fig6 = px.histogram(filtered_df, x="Rating", nbins=10, color="Brand", title="Distribution of Ratings")
+    fig6 = px.histogram(filtered_df, x="Rating", nbins=10, color="Brand",
+                        title="Rating Distribution", barmode='group', opacity=0.75)
+
     fig7 = px.scatter(filtered_df, x="Rating", y="Reviews", color="Brand", size="Reviews",
-                      title="Rating vs Number of Reviews", hover_data=["Product Name"])
+                      title="Rating vs Number of Reviews", hover_name="Product Name")
 
     st.plotly_chart(fig6, use_container_width=True)
     st.plotly_chart(fig7, use_container_width=True)
@@ -96,7 +106,4 @@ with tab3:
         st.pyplot(plt)
 
 st.markdown("---")
-st.caption("Crafted with ❤️ using Streamlit")
-
-
-
+st.caption("Crafted with ❤️ using Streamlit and Plotly")
