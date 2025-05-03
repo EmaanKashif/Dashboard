@@ -14,6 +14,10 @@ st.title("👟 Adidas vs Nike Sales Dashboard")
 if st.checkbox("Show Raw Data"):
     st.write(df)
 
+# Show the data types of columns
+st.write("### Data Types of Columns")
+st.write(df.dtypes)
+
 # Filter by Brand
 brands = df['Brand'].unique()
 selected_brand = st.selectbox("Select Brand", brands)
@@ -21,6 +25,10 @@ filtered_df = df[df['Brand'] == selected_brand]
 
 st.subheader(f"📊 Summary Statistics for {selected_brand}")
 st.dataframe(filtered_df.describe())
+
+# Show missing data info
+st.write("### Missing Data in Columns")
+st.write(filtered_df.isnull().sum())
 
 # Use columns to show charts side-by-side
 col1, col2 = st.columns(2)
@@ -45,6 +53,10 @@ filtered_df_numeric = filtered_df[numeric_columns]
 
 # Check for missing values and drop rows with NaNs in numeric columns
 filtered_df_numeric = filtered_df_numeric.dropna()
+
+# Check the data after cleaning
+st.write("### Cleaned Data for Correlation")
+st.write(filtered_df_numeric.describe())
 
 # Remove constant columns (no variation)
 filtered_df_numeric = filtered_df_numeric.loc[:, filtered_df_numeric.std() > 0]
