@@ -18,13 +18,17 @@ country_filter = st.sidebar.multiselect(
 
 # Sample data (replace with actual data sources)
 data = {
-    "Country": ["Myanmar", "Thailand", "China", "Vietnam"],
-    "Casualties": [5443, 90, 2, 1],
-    "Injuries": [11402, 33, 0, 0],
-    "Missing": [549, 11, 0, 0],
-    "Affected Buildings": [8300, 169, 400, 400]
+    "Country": ["Myanmar", "Myanmar", "Thailand", "Thailand", "China", "China", "Vietnam", "Vietnam", "Myanmar", "Thailand", "China", "Vietnam"],
+    "Region": ["Yangon", "Mandalay", "Chiang Mai", "Bangkok", "Yunnan", "Guangxi", "Hanoi", "Ho Chi Minh", "Naypyidaw", "Phuket", "Guizhou", "Da Nang"],
+    "Date": ["2025-04-01", "2025-04-02", "2025-04-01", "2025-04-03", "2025-04-01", "2025-04-02", "2025-04-02", "2025-04-03", "2025-04-03", "2025-04-04", "2025-04-04", "2025-04-04"],
+    "Casualties": [3000, 2443, 40, 50, 1, 1, 1, 0, 1000, 30, 0, 0],
+    "Injuries": [6000, 5402, 15, 18, 0, 0, 0, 0, 2000, 5, 0, 0],
+    "Missing": [300, 249, 5, 6, 0, 0, 0, 0, 100, 0, 0, 0],
+    "Affected Buildings": [5000, 3300, 80, 89, 200, 200, 100, 300, 2500, 20, 100, 100],
+    "Damage Cost (USD Millions)": [150, 120, 10, 12, 2, 3, 1, 1.5, 80, 1, 1, 1]
 }
 df = pd.DataFrame(data)
+
 filtered_df = df[df["Country"].isin(country_filter)]
 
 # Display metrics
