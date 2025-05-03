@@ -30,6 +30,16 @@ st.dataframe(filtered_df.describe())
 st.write("### Missing Data in Columns")
 st.write(filtered_df.isnull().sum())
 
+# Check value ranges and identify constant columns
+st.write("### Checking Value Ranges in Numeric Columns")
+numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
+st.write(filtered_df[numeric_columns].describe())
+
+# Show unique values for each numeric column to identify constants
+st.write("### Unique Values for Numeric Columns")
+for column in numeric_columns:
+    st.write(f"Unique values in {column}: {filtered_df[column].nunique()}")
+
 # Use columns to show charts side-by-side
 col1, col2 = st.columns(2)
 
@@ -47,16 +57,8 @@ with col2:
     sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
     st.pyplot(fig2, clear_figure=True)
 
-# Filter numeric columns
-numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
-filtered_df_numeric = filtered_df[numeric_columns]
-
-# Check for missing values and drop rows with NaNs in numeric columns
-filtered_df_numeric = filtered_df_numeric.dropna()
-
-# Check the data after cleaning
-st.write("### Cleaned Data for Correlation")
-st.write(filtered_df_numeric.describe())
+# Filter numeric columns and drop rows with NaNs
+filtered_df_numeric = filtered_df[numeric_columns].dropna()
 
 # Remove constant columns (no variation)
 filtered_df_numeric = filtered_df_numeric.loc[:, filtered_df_numeric.std() > 0]
@@ -70,3 +72,4 @@ if len(filtered_df_numeric.columns) > 1:
     st.pyplot(fig3, clear_figure=True)
 else:
     st.write("🔴 Not enough numeric data to generate a meaningful correlation heatmap.")
+
