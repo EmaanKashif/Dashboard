@@ -22,23 +22,21 @@ filtered_df = df[df['Brand'] == selected_brand]
 st.subheader(f"📊 Summary Statistics for {selected_brand}")
 st.write(filtered_df.describe())
 
-# Price Distribution
-st.subheader(f"📈 Price Distribution for {selected_brand}")
+# Price Distribution (using 'Sale Price')
+st.subheader(f"📈 Sale Price Distribution for {selected_brand}")
 fig, ax = plt.subplots()
-sns.histplot(filtered_df['Price'], kde=True, ax=ax, color='skyblue')
+sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
 st.pyplot(fig)
 
-# Category Count
-if 'Category' in df.columns:
-    st.subheader(f"📊 Product Categories for {selected_brand}")
-    category_counts = filtered_df['Category'].value_counts()
-    st.bar_chart(category_counts)
+# Discount Distribution
+st.subheader(f"📉 Discount Distribution for {selected_brand}")
+fig2, ax2 = plt.subplots()
+sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
+st.pyplot(fig2)
 
 # Correlation Heatmap
-if filtered_df.select_dtypes(include='number').shape[1] > 1:
-    st.subheader(f"🔍 Correlation Heatmap for {selected_brand}")
-    corr = filtered_df.select_dtypes(include='number').corr()
-    fig2, ax2 = plt.subplots()
-    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax2)
-    st.pyplot(fig2)
-
+st.subheader(f"🔍 Correlation Heatmap for {selected_brand}")
+corr = filtered_df[['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']].corr()
+fig3, ax3 = plt.subplots()
+sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3)
+st.pyplot(fig3)
