@@ -22,6 +22,12 @@ df['Date'] = pd.to_datetime(df['Date'])
 # Compute Total Sales column
 df['Total'] = df['Quantity'] * df['Price']
 
+st.subheader("🗃️ Preview of Amazon Sales Data")
+st.dataframe(df.head())  # Show first few rows of the DataFrame
+
+# Optional: Show dimensions
+st.caption(f"Dataset contains {df.shape[0]} rows and {df.shape[1]} columns.")
+
 # Sidebar filters
 with st.sidebar:
     st.header("Filters")
