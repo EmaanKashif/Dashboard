@@ -2,8 +2,7 @@ import zipfile
 import os
 
 # Path to your zip file
-zip_file_path = 'Dashboard
-/archive (3).zip'
+zip_file_path = 'Dashboard/archive (3).zip'
 extracted_folder = 'extracted_data/'
 
 # Create the extracted folder if it doesn't exist
