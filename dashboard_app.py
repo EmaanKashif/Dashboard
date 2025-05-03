@@ -27,16 +27,22 @@ st.subheader(f"📈 Sale Price Distribution for {selected_brand}")
 fig, ax = plt.subplots()
 sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
 st.pyplot(fig)
+# Sale Price Distribution
+st.subheader(f"📈 Sale Price Distribution for {selected_brand}")
+fig, ax = plt.subplots(figsize=(8, 4))
+sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
+st.pyplot(fig)
 
 # Discount Distribution
 st.subheader(f"📉 Discount Distribution for {selected_brand}")
-fig2, ax2 = plt.subplots()
+fig2, ax2 = plt.subplots(figsize=(8, 4))
 sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
 st.pyplot(fig2)
 
 # Correlation Heatmap
 st.subheader(f"🔍 Correlation Heatmap for {selected_brand}")
-corr = filtered_df[['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']].corr()
-fig3, ax3 = plt.subplots()
+fig3, ax3 = plt.subplots(figsize=(6, 4))
 sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3)
 st.pyplot(fig3)
+
+
