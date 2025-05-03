@@ -20,29 +20,34 @@ selected_brand = st.selectbox("Select Brand", brands)
 filtered_df = df[df['Brand'] == selected_brand]
 
 st.subheader(f"📊 Summary Statistics for {selected_brand}")
-st.write(filtered_df.describe())
+st.dataframe(filtered_df.describe())
 
-# Price Distribution (using 'Sale Price')
-st.subheader(f"📈 Sale Price Distribution for {selected_brand}")
-fig, ax = plt.subplots()
-sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
-st.pyplot(fig)
+# Use columns to show charts side-by-side
+col1, col2 = st.columns(2)
+
 # Sale Price Distribution
-st.subheader(f"📈 Sale Price Distribution for {selected_brand}")
-fig, ax = plt.subplots(figsize=(5, 3))
-sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
-st.pyplot(fig)
+with col1:
+    st.markdown("### 📈 Sale Price Distribution")
+    fig, ax = plt.subplots(figsize=(5, 3))
+    sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
+    st.pyplot(fig, clear_figure=True)
 
 # Discount Distribution
-st.subheader(f"📉 Discount Distribution for {selected_brand}")
-fig2, ax2 = plt.subplots(figsize=(5, 3))
-sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
-st.pyplot(fig2)
+with col2:
+    st.markdown("### 📉 Discount Distribution")
+    fig2, ax2 = plt.subplots(figsize=(5, 3))
+    sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
+    st.pyplot(fig2, clear_figure=True)
 
-# Correlation Heatmap
-st.subheader(f"🔍 Correlation Heatmap for {selected_brand}")
-fig3, ax3 = plt.subplots(figsize=(6, 4))
-sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3)
-st.pyplot(fig3)
+# Correlation Heatmap (Check if numeric columns exist)
+numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
+if all(col in filtered_df.columns for col in numeric_columns):
+    st.markdown("### 🔍 Correlation Heatmap")
+    corr = filtered_df[numeric_columns].corr()
+    fig3, ax3 = plt.subplots(figsize=(6, 4))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3)
+    st.pyplot(fig3, clear_figure=True)
+else:
+    st.write("🔴 Not enough numeric data to generate a correlation heatmap.")
 
 
