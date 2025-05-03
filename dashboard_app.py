@@ -6,6 +6,17 @@ import matplotlib.pyplot as plt
 
 # Load data
 df = pd.read_csv("Adidas Vs Nike.csv")
+# Normalize brand names
+df['Brand'] = df['Brand'].str.lower().str.strip()
+df['Brand'] = df['Brand'].replace({
+    'adidas core / neo': 'adidas',
+    'adidas originals': 'adidas',
+    'adidas performance': 'adidas',
+    'nike sportswear': 'nike',
+    'nike performance': 'nike',
+    'nike sb': 'nike'
+})
+
 
 st.set_page_config(page_title="Adidas vs Nike Dashboard", layout="wide")
 st.title("📈 Adidas vs Nike Product Dashboard")
