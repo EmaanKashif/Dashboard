@@ -14,62 +14,48 @@ st.title("👟 Adidas vs Nike Sales Dashboard")
 if st.checkbox("Show Raw Data"):
     st.write(df)
 
-# Show the data types of columns
-st.write("### Data Types of Columns")
-st.write(df.dtypes)
+# Ensure that the columns are numeric
+df['Listing Price'] = pd.to_numeric(df['Listing Price'], errors='coerce')
+df['Sale Price'] = pd.to_numeric(df['Sale Price'], errors='coerce')
+df['Discount'] = pd.to_numeric(df['Discount'], errors='coerce')
+df['Rating'] = pd.to_numeric(df['Rating'], errors='coerce')
+df['Reviews'] = pd.to_numeric(df['Reviews'], errors='coerce')
 
 # Filter by Brand
 brands = df['Brand'].unique()
 selected_brand = st.selectbox("Select Brand", brands)
 filtered_df = df[df['Brand'] == selected_brand]
 
+# Show Summary Statistics
 st.subheader(f"📊 Summary Statistics for {selected_brand}")
 st.dataframe(filtered_df.describe())
 
-# Show missing data info
-st.write("### Missing Data in Columns")
-st.write(filtered_df.isnull().sum())
+# Bar Plot for Brand Distribution
+st.markdown("### 🏷️ Product Count by Brand")
+fig1, ax1 = plt.subplots(figsize=(6, 4))
+filtered_df['Brand'].value_counts().plot(kind='bar', color='skyblue', ax=ax1)
+ax1.set_title("Product Count by Brand")
+st.pyplot(fig1)
 
-# Check value ranges and identify constant columns
-st.write("### Checking Value Ranges in Numeric Columns")
-numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
-st.write(filtered_df[numeric_columns].describe())
+# Histogram for Sale Price Distribution
+st.markdown("### 📈 Sale Price Distribution")
+fig2, ax2 = plt.subplots(figsize=(6, 4))
+sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax2, color='lightgreen')
+ax2.set_title("Sale Price Distribution")
+st.pyplot(fig2)
 
-# Show unique values for each numeric column to identify constants
-st.write("### Unique Values for Numeric Columns")
-for column in numeric_columns:
-    st.write(f"Unique values in {column}: {filtered_df[column].nunique()}")
+# Scatter Plot: Sale Price vs Listing Price
+st.markdown("### 📉 Sale Price vs Listing Price")
+fig3, ax3 = plt.subplots(figsize=(6, 4))
+sns.scatterplot(x=filtered_df['Listing Price'], y=filtered_df['Sale Price'], ax=ax3, color='orange')
+ax3.set_title("Sale Price vs Listing Price")
+st.pyplot(fig3)
 
-# Use columns to show charts side-by-side
-col1, col2 = st.columns(2)
+# Box Plot for Discount Distribution
+st.markdown("### 📊 Discount Distribution")
+fig4, ax4 = plt.subplots(figsize=(6, 4))
+sns.boxplot(data=filtered_df, x='Discount', ax=ax4, color='lightcoral')
+ax4.set_title("Discount Distribution")
+st.pyplot(fig4)
 
-# Sale Price Distribution
-with col1:
-    st.markdown("### 📈 Sale Price Distribution")
-    fig, ax = plt.subplots(figsize=(5, 3))
-    sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
-    st.pyplot(fig, clear_figure=True)
-
-# Discount Distribution
-with col2:
-    st.markdown("### 📉 Discount Distribution")
-    fig2, ax2 = plt.subplots(figsize=(5, 3))
-    sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
-    st.pyplot(fig2, clear_figure=True)
-
-# Filter numeric columns and drop rows with NaNs
-filtered_df_numeric = filtered_df[numeric_columns].dropna()
-
-# Remove constant columns (no variation)
-filtered_df_numeric = filtered_df_numeric.loc[:, filtered_df_numeric.std() > 0]
-
-# Check if there are at least 2 numeric columns left
-if len(filtered_df_numeric.columns) > 1:
-    st.markdown("### 🔍 Correlation Heatmap")
-    corr = filtered_df_numeric.corr()
-    fig3, ax3 = plt.subplots(figsize=(6, 4))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3, cbar_kws={'shrink': 0.8})
-    st.pyplot(fig3, clear_figure=True)
-else:
-    st.write("🔴 Not enough numeric data to generate a meaningful correlation heatmap.")
 
