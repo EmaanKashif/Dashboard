@@ -39,19 +39,22 @@ with col2:
     sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
     st.pyplot(fig2, clear_figure=True)
 
+# Filter numeric columns
 numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
 filtered_df_numeric = filtered_df[numeric_columns]
 
-# Drop columns where standard deviation is zero (constant columns)
+# Check for missing values and drop rows with NaNs in numeric columns
+filtered_df_numeric = filtered_df_numeric.dropna()
+
+# Remove constant columns (no variation)
 filtered_df_numeric = filtered_df_numeric.loc[:, filtered_df_numeric.std() > 0]
 
-# Correlation Heatmap
-if len(filtered_df_numeric.columns) > 1:  # Ensure there are at least 2 columns to correlate
+# Check if there are at least 2 numeric columns left
+if len(filtered_df_numeric.columns) > 1:
     st.markdown("### 🔍 Correlation Heatmap")
     corr = filtered_df_numeric.corr()
-    fig3, ax3 = plt.subplots(figsize=(5, 4))
+    fig3, ax3 = plt.subplots(figsize=(6, 4))
     sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3, cbar_kws={'shrink': 0.8})
     st.pyplot(fig3, clear_figure=True)
 else:
     st.write("🔴 Not enough numeric data to generate a meaningful correlation heatmap.")
-
