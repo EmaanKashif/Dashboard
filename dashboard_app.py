@@ -64,6 +64,17 @@ fig_pie = px.pie(
     title="Affected Buildings Distribution by Country"
 )
 st.plotly_chart(fig_pie, use_container_width=True)
+st.subheader("📊 Casualties by Date and Country")
+fig_bar = px.bar(
+    filtered_df,
+    x="Date",
+    y="Casualties",
+    color="Country",
+    barmode="group",
+    title="Casualties by Date and Country"
+)
+st.plotly_chart(fig_bar, use_container_width=True)
+
 
 # Display total damage cost
 total_cost = filtered_df["Damage Cost (USD Millions)"].sum()
