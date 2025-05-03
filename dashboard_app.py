@@ -29,13 +29,13 @@ sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
 st.pyplot(fig)
 # Sale Price Distribution
 st.subheader(f"📈 Sale Price Distribution for {selected_brand}")
-fig, ax = plt.subplots(figsize=(8, 4))
+fig, ax = plt.subplots(figsize=(5, 3))
 sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax, color='skyblue')
 st.pyplot(fig)
 
 # Discount Distribution
 st.subheader(f"📉 Discount Distribution for {selected_brand}")
-fig2, ax2 = plt.subplots(figsize=(8, 4))
+fig2, ax2 = plt.subplots(figsize=(5, 3))
 sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
 st.pyplot(fig2)
 
