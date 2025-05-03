@@ -39,7 +39,7 @@ with col2:
     sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
     st.pyplot(fig2, clear_figure=True)
 
-umeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
+numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
 filtered_df_numeric = filtered_df[numeric_columns]
 
 # Drop columns where standard deviation is zero (constant columns)
