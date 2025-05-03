@@ -14,7 +14,7 @@ df = pd.read_csv("amazon_sales_data 2025.csv")
 df['Date'] = pd.to_datetime(df['Date'])
 
 # 1. Total Sales by Product Category
-df['Total'] = df['Quantity'] * df['Price Each']
+df['Total'] = df['Quantity'] * df['Price']
 category_sales = df.groupby('Product')['Total'].sum().sort_values(ascending=False)
 
 plt.figure(figsize=(10, 5))
