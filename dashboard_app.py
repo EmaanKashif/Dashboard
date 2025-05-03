@@ -48,5 +48,7 @@ st.plotly_chart(fig, use_container_width=True)
 
 # Display data table
 st.subheader("📄 Detailed Data")
-st.dataframe(filtered_df.reset_index(drop=True))
+st.dataframe(filtered_df.reset_index(drop=True))  # Display filtered data
+
+
 
