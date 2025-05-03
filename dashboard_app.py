@@ -1,61 +1,91 @@
 import streamlit as st
 import pandas as pd
+import plotly.express as px
+from wordcloud import WordCloud
 import matplotlib.pyplot as plt
-import seaborn as sns
-
-st.set_page_config(page_title="Adidas vs Nike Dashboard", layout="wide")
 
 # Load data
 df = pd.read_csv("Adidas Vs Nike.csv")
 
-st.title("👟 Adidas vs Nike Sales Dashboard")
+st.set_page_config(page_title="Adidas vs Nike Dashboard", layout="wide")
+st.title("📈 Adidas vs Nike Product Dashboard")
 
-# Show raw data
-if st.checkbox("Show Raw Data"):
-    st.write(df)
+# Sidebar filters
+brands = df['Brand'].unique().tolist()
+selected_brand = st.sidebar.multiselect("Select Brand(s)", brands, default=brands)
 
-# Ensure that the columns are numeric
-df['Listing Price'] = pd.to_numeric(df['Listing Price'], errors='coerce')
-df['Sale Price'] = pd.to_numeric(df['Sale Price'], errors='coerce')
-df['Discount'] = pd.to_numeric(df['Discount'], errors='coerce')
-df['Rating'] = pd.to_numeric(df['Rating'], errors='coerce')
-df['Reviews'] = pd.to_numeric(df['Reviews'], errors='coerce')
+min_price = int(df['Sale Price'].min())
+max_price = int(df['Sale Price'].max())
+price_range = st.sidebar.slider("Select Sale Price Range", min_price, max_price, (min_price, max_price))
 
-# Filter by Brand
-brands = df['Brand'].unique()
-selected_brand = st.selectbox("Select Brand", brands)
-filtered_df = df[df['Brand'] == selected_brand]
+# Filtered Data
+filtered_df = df[
+    (df['Brand'].isin(selected_brand)) &
+    (df['Sale Price'].between(price_range[0], price_range[1]))
+]
 
-# Show Summary Statistics
-st.subheader(f"📊 Summary Statistics for {selected_brand}")
-st.dataframe(filtered_df.describe())
+st.markdown("---")
 
-# Bar Plot for Brand Distribution
-st.markdown("### 🏷️ Product Count by Brand")
-fig1, ax1 = plt.subplots(figsize=(6, 4))
-filtered_df['Brand'].value_counts().plot(kind='bar', color='skyblue', ax=ax1)
-ax1.set_title("Product Count by Brand")
-st.pyplot(fig1)
+# KPIs
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Products", len(filtered_df))
+col2.metric("Average Discount (%)", round(filtered_df['Discount'].mean(), 2))
+col3.metric("Average Rating", round(filtered_df['Rating'].mean(), 2))
 
-# Histogram for Sale Price Distribution
-st.markdown("### 📈 Sale Price Distribution")
-fig2, ax2 = plt.subplots(figsize=(6, 4))
-sns.histplot(filtered_df['Sale Price'], kde=True, ax=ax2, color='lightgreen')
-ax2.set_title("Sale Price Distribution")
-st.pyplot(fig2)
+# Tabs for visualization
+tab1, tab2, tab3 = st.tabs(["Brand Insights", "Price & Discounts", "Customer Feedback"])
 
-# Scatter Plot: Sale Price vs Listing Price
-st.markdown("### 📉 Sale Price vs Listing Price")
-fig3, ax3 = plt.subplots(figsize=(6, 4))
-sns.scatterplot(x=filtered_df['Listing Price'], y=filtered_df['Sale Price'], ax=ax3, color='orange')
-ax3.set_title("Sale Price vs Listing Price")
-st.pyplot(fig3)
+with tab1:
+    st.subheader("🔍 Brand-Level Insights")
 
-# Box Plot for Discount Distribution
-st.markdown("### 📊 Discount Distribution")
-fig4, ax4 = plt.subplots(figsize=(6, 4))
-sns.boxplot(data=filtered_df, x='Discount', ax=ax4, color='lightcoral')
-ax4.set_title("Discount Distribution")
-st.pyplot(fig4)
+    brand_group = filtered_df.groupby("Brand").agg({
+        "Sale Price": "mean",
+        "Listing Price": "mean",
+        "Discount": "mean",
+        "Rating": "mean"
+    }).reset_index()
+
+    fig1 = px.bar(brand_group, x="Brand", y="Discount", title="Average Discount by Brand", color="Brand")
+    fig2 = px.bar(brand_group, x="Brand", y="Rating", title="Average Rating by Brand", color="Brand")
+
+    st.plotly_chart(fig1, use_container_width=True)
+    st.plotly_chart(fig2, use_container_width=True)
+
+with tab2:
+    st.subheader("💸 Price & Discount Analysis")
+
+    fig3 = px.histogram(filtered_df, x="Discount", nbins=30, color="Brand", title="Distribution of Discounts")
+    fig4 = px.scatter(filtered_df, x="Listing Price", y="Sale Price", color="Brand", size="Discount",
+                      title="Sale vs Listing Price", hover_data=["Product Name"])
+
+    top_discounts = filtered_df.sort_values("Discount", ascending=False).head(10)
+    fig5 = px.bar(top_discounts, x="Product Name", y="Discount", color="Brand",
+                  title="Top 10 Highest Discounted Products")
+
+    st.plotly_chart(fig3, use_container_width=True)
+    st.plotly_chart(fig4, use_container_width=True)
+    st.plotly_chart(fig5, use_container_width=True)
+
+with tab3:
+    st.subheader("⭐ Customer Feedback")
+
+    fig6 = px.histogram(filtered_df, x="Rating", nbins=10, color="Brand", title="Distribution of Ratings")
+    fig7 = px.scatter(filtered_df, x="Rating", y="Reviews", color="Brand", size="Reviews",
+                      title="Rating vs Number of Reviews", hover_data=["Product Name"])
+
+    st.plotly_chart(fig6, use_container_width=True)
+    st.plotly_chart(fig7, use_container_width=True)
+
+    # Optional Word Cloud from Descriptions
+    if st.checkbox("Show Word Cloud from Descriptions"):
+        text = " ".join(desc for desc in filtered_df['Description'].dropna())
+        wordcloud = WordCloud(background_color='white', max_words=100).generate(text)
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.axis("off")
+        st.pyplot(plt)
+
+st.markdown("---")
+st.caption("Crafted with ❤️ using Streamlit")
+
 
 
