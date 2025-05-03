@@ -44,7 +44,8 @@ numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews
 if all(col in filtered_df.columns for col in numeric_columns):
     st.markdown("### 🔍 Correlation Heatmap")
     corr = filtered_df[numeric_columns].corr()
-    fig3, ax3 = plt.subplots(figsize=(6, 4))
+    fig3, ax3 = plt.subplots(figsize=(5,3))
+    
     sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3)
     st.pyplot(fig3, clear_figure=True)
 else:
