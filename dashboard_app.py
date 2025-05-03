@@ -39,16 +39,19 @@ with col2:
     sns.histplot(filtered_df['Discount'], kde=True, ax=ax2, color='lightgreen')
     st.pyplot(fig2, clear_figure=True)
 
-# Correlation Heatmap (Check if numeric columns exist)
-numeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
-if all(col in filtered_df.columns for col in numeric_columns):
+umeric_columns = ['Listing Price', 'Sale Price', 'Discount', 'Rating', 'Reviews']
+filtered_df_numeric = filtered_df[numeric_columns]
+
+# Drop columns where standard deviation is zero (constant columns)
+filtered_df_numeric = filtered_df_numeric.loc[:, filtered_df_numeric.std() > 0]
+
+# Correlation Heatmap
+if len(filtered_df_numeric.columns) > 1:  # Ensure there are at least 2 columns to correlate
     st.markdown("### 🔍 Correlation Heatmap")
-    corr = filtered_df[numeric_columns].corr()
-    fig3, ax3 = plt.subplots(figsize=(4,2))
-    
-    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3)
+    corr = filtered_df_numeric.corr()
+    fig3, ax3 = plt.subplots(figsize=(5, 4))
+    sns.heatmap(corr, annot=True, cmap='coolwarm', ax=ax3, cbar_kws={'shrink': 0.8})
     st.pyplot(fig3, clear_figure=True)
 else:
-    st.write("🔴 Not enough numeric data to generate a correlation heatmap.")
-
+    st.write("🔴 Not enough numeric data to generate a meaningful correlation heatmap.")
 
