@@ -6,8 +6,18 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 # Load and clean data
+# Clean and normalize brand names
+
 df = pd.read_csv("Adidas Vs Nike.csv")
 df['Brand'] = df['Brand'].str.lower().str.strip()
+# Clean and normalize brand names
+df['Brand'] = df['Brand'].str.lower().str.strip()
+
+# Assign Adidas or Nike based on whether the name contains 'adidas' or 'nike'
+df['Brand'] = df['Brand'].apply(
+    lambda x: 'adidas' if 'adidas' in x else ('nike' if 'nike' in x else x)
+)
+
 df['Brand'] = df['Brand'].replace({
     'adidas core / neo': 'adidas',
     'adidas originals': 'adidas',
